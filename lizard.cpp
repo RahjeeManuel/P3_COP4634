@@ -173,6 +173,7 @@ int Cat::getId()
 	 // wait for the thread to terminate
 	if (_catThread != NULL) {     //rm
         _catThread->join();
+        delete _catThread;
     } 
  }
  
@@ -311,6 +312,7 @@ int Lizard::getId()
 	 // wait for the thread to terminate
 	if (_aLizard != NULL) {
         _aLizard->join();
+        delete _aLizard;
     } 
  }
  
@@ -364,7 +366,7 @@ void Lizard::sago2MonkeyGrassIsSafe()
 		cout << flush;
     }
 
-	
+	//TODO: use synchronization to return when it is safe to cross
 
 
 	if (debug)
@@ -488,7 +490,7 @@ void Lizard::monkeyGrass2SagoIsSafe()
     }
 
 
-
+  //TODO: use synchronization to return when it is safe to cross
 
 
 	if (debug)
@@ -589,6 +591,15 @@ void Lizard::lizardThread(Lizard *aLizard)
        * some functions by filling in the code.  Some  
        * are already completed - see the comments.
        */
+
+      aLizard->sleepNow();      //rm
+      aLizard->sago2MonkeyGrassIsSafe();
+      aLizard->crossSago2MonkeyGrass();
+      aLizard->madeIt2MonkeyGrass();
+      aLizard->eat();
+      aLizard->monkeyGrass2SagoIsSafe();
+      aLizard->crossMonkeyGrass2Sago();
+      aLizard->madeIt2Sago();
 
 
 
@@ -730,7 +741,7 @@ int main(int argc, char **argv)
     }
     for (int i=0; i < NUM_CATS; i++) {
 	    delete allCats.at(i);
-    }          
+    } 
  
 
 
