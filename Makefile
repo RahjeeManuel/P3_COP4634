@@ -2,14 +2,14 @@ OBJS	= lizard.o
 SOURCE	= lizard.cpp
 OUT	= lizard
 CC	 = g++
-FLAGS	 = -g -Wall
-LFLAGS	 = -lpthread
+FLAGS	 = -g -c -Wall -std=c++11
+LFLAGS	 = -pthread
 
 all: $(OBJS)
-	$(CC) -g $(OBJS) -o $(OUT) $(LFLAGS)
+	$(CC) $(OBJS) -o $(OUT) $(LFLAGS)
 
 lizard.o: lizard.cpp
-	$(CC) $(FLAGS) lizard.cpp -std=c++11
+	$(CC) $(FLAGS) lizard.cpp
 
 clean:
 	rm -f $(OBJS) $(OUT)

@@ -160,7 +160,7 @@ int Cat::getId()
  void Cat::run() 
  {
 	 // launch the thread to simulate the cat's behavior	 
-	 
+	 _catThread = new thread ( catThread, this);      //rm
  }
  
  /**
@@ -171,6 +171,9 @@ int Cat::getId()
  void Cat::wait()
  {
 	 // wait for the thread to terminate
+	if (_catThread != NULL) {     //rm
+        _catThread->join();
+    } 
  }
  
  
@@ -670,6 +673,10 @@ int main(int argc, char **argv)
     /*
      * Create NUM_CATS cat threads
      */
+    vector<Cat*> allCats;     //rm
+    for (int i=0; i < NUM_CATS; i++) {
+	    allCats.push_back(new Cat(i));
+    }      
 	 
 
 	/*
@@ -678,6 +685,9 @@ int main(int argc, char **argv)
     for (int i=0; i < NUM_LIZARDS; i++) {
         allLizards[i]->run();
     }
+    for (int i=0; i < NUM_CATS; i++) {      //rm
+        allCats[i]->run();
+    }    
 
 	/*
      * Now let the world run for a while
@@ -694,6 +704,12 @@ int main(int argc, char **argv)
     /*
      * Wait until all threads terminate
      */
+    for (int i=0; i < NUM_LIZARDS; i++) {     //rm
+        allLizards[i]->wait();
+    }
+    for (int i=0; i < NUM_CATS; i++) {
+        allCats[i]->wait();
+    }      
 
 
 
@@ -709,6 +725,12 @@ int main(int argc, char **argv)
 	/*
 	 * Delete all cat and lizard objects
 	 */
+    for (int i=0; i < NUM_LIZARDS; i++) {     //rm
+	    delete allLizards.at(i);
+    }
+    for (int i=0; i < NUM_CATS; i++) {
+	    delete allCats.at(i);
+    }          
  
 
 
