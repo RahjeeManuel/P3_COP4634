@@ -94,7 +94,8 @@ using namespace std;
 /*
  * Declare global variables here
  */
-
+mutex mutex_m;     //rm
+int sem_val;
 
 /**************************************************/
 /* Please leave these variables alone.  They are  */
@@ -366,8 +367,16 @@ void Lizard::sago2MonkeyGrassIsSafe()
 		cout << flush;
     }
 
-	//TODO: use synchronization to return when it is safe to cross
-
+    while (1) {     //rm
+      mutex_m.lock();
+      if (sem_val > 0) {
+        sem_val--;
+        mutex_m.unlock();
+        break;
+      } else {
+        mutex_m.unlock();
+      }
+    }
 
 	if (debug)
     {
@@ -437,7 +446,9 @@ void Lizard::madeIt2MonkeyGrass()
 		cout << flush;
     }
 
-
+    mutex_m.lock();     //rm
+    sem_val++;
+    mutex_m.unlock();
 
 
 
@@ -489,8 +500,16 @@ void Lizard::monkeyGrass2SagoIsSafe()
 		cout << flush;
     }
 
-
-  //TODO: use synchronization to return when it is safe to cross
+    while (1) {     //rm
+      mutex_m.lock();
+      if (sem_val > 0) {
+        sem_val--;
+        mutex_m.unlock();
+        break;
+      } else {
+        mutex_m.unlock();
+      }
+    }
 
 
 	if (debug)
@@ -561,6 +580,11 @@ void Lizard::madeIt2Sago()
 		cout << "[" << _id << "] made the  monkey grass -> sago  crossing" << endl;
 		cout << flush;
     }
+
+    mutex_m.lock();     //rm
+    sem_val++;
+    mutex_m.unlock();
+
 }
 
 /**
@@ -619,7 +643,6 @@ void Lizard::lizardThread(Lizard *aLizard)
 
 
     }
-
 }
  
 
@@ -668,7 +691,7 @@ int main(int argc, char **argv)
 	/*
      * Initialize locks and/or semaphores
      */
-
+    sem_val = MAX_LIZARD_CROSSING;
 
 
 
@@ -720,7 +743,7 @@ int main(int argc, char **argv)
     }
     for (int i=0; i < NUM_CATS; i++) {
         allCats[i]->wait();
-    }      
+    } 
 
 
 
