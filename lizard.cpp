@@ -25,6 +25,7 @@
 #include <thread>
 #include <mutex>
 #include <vector>
+#include <condition_variable>
 
 
 using namespace std;
@@ -96,6 +97,7 @@ using namespace std;
  */
 mutex mutex_m;     //rm
 int sem_val;
+condition_variable lock_cv;
 
 /**************************************************/
 /* Please leave these variables alone.  They are  */
@@ -366,15 +368,17 @@ void Lizard::sago2MonkeyGrassIsSafe()
 		cout << "[" << _id << "] checking  sago -> monkey grass" << endl;
 		cout << flush;
     }
-
-    while (1) {     //rm
+		
+    while (true) {     //rm			//this loop will run a max of two times
       mutex_m.lock();
       if (sem_val > 0) {
         sem_val--;
         mutex_m.unlock();
         break;
       } else {
-        mutex_m.unlock();
+      	mutex_m.unlock();
+      	unique_lock<mutex> wait_lock(mutex_m);
+		lock_cv.wait(wait_lock, [] {return sem_val > 0;});			//loop stops here until notified and predicate is true
       }
     }
 
@@ -448,6 +452,7 @@ void Lizard::madeIt2MonkeyGrass()
 
     mutex_m.lock();     //rm
     sem_val++;
+    lock_cv.notify_one();
     mutex_m.unlock();
 
 
@@ -500,17 +505,18 @@ void Lizard::monkeyGrass2SagoIsSafe()
 		cout << flush;
     }
 
-    while (1) {     //rm
+    while (true) {     //rm			//this loop will run a max of two times
       mutex_m.lock();
       if (sem_val > 0) {
         sem_val--;
         mutex_m.unlock();
         break;
       } else {
-        mutex_m.unlock();
+      	mutex_m.unlock();
+      	unique_lock<mutex> wait_lock(mutex_m);
+		lock_cv.wait(wait_lock, [] {return sem_val > 0;});			//loop stops here until notified and predicate is true
       }
     }
-
 
 	if (debug)
     {
@@ -583,6 +589,7 @@ void Lizard::madeIt2Sago()
 
     mutex_m.lock();     //rm
     sem_val++;
+    lock_cv.notify_one();
     mutex_m.unlock();
 
 }
