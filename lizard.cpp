@@ -94,9 +94,9 @@ using namespace std;
 /*
  * Declare global variables here
  */
-mutex mutex_lock;   //rm
+mutex m_lock;   //rm
 condition_variable cv_lock;
-int semaphore_value;
+int s_val;
 
 /**************************************************/
 /* Please leave these variables alone.  They are  */
@@ -371,23 +371,23 @@ void Lizard::sago2MonkeyGrassIsSafe()
     /**
      * Using condition variables to prevent busy waiting
      * 
-     * If semaphore_counter > 0 then it is safe to cross
+     * If s_val > 0 then it is safe to cross
      * otherwise, stop the thread using wait()
      * 
-     * When a thread finishes crossing, it will notify another thread using the notify_one()
-     * once one thread is notified, if it's predicate is true (semaphore_value > 0), 
-     * then the thread will no longer wait() so it can now cross
+     * When a thread finishes crossing, it will notify another thread using notify_one()
+     * and once one thread is notified and it's predicate (s_val > 0) is true, 
+     * then the thread will iterate the loop again, skipping wait() and decrementing s_val so it can now cross
      */
     while (true) {    //rm
-      mutex_lock.lock();
-      if (semaphore_value > 0) {
-        semaphore_value--;
-        mutex_lock.unlock();
+      m_lock.lock();
+      if (s_val > 0) {
+        s_val--;
+        m_lock.unlock();
         break;
       } else {
-      	mutex_lock.unlock();
-      	unique_lock<mutex> wait_lock(mutex_lock);
-		    cv_lock.wait(wait_lock, [] {return semaphore_value > 0;});
+      	m_lock.unlock();
+      	unique_lock<mutex> wait_lock(m_lock);
+		    cv_lock.wait(wait_lock, [] {return s_val > 0;});
       }
     }
 
@@ -459,9 +459,12 @@ void Lizard::madeIt2MonkeyGrass()
 		cout << flush;
     }
 
-    mutex_lock.lock();    //rm
-    semaphore_value++;
-    mutex_lock.unlock();
+    /**
+     * Increment s_val then notify another thread
+     */
+    m_lock.lock();    //rm
+    s_val++;
+    m_lock.unlock();
     cv_lock.notify_one();
 
 
@@ -517,23 +520,23 @@ void Lizard::monkeyGrass2SagoIsSafe()
     /**
      * Using condition variables to prevent busy waiting
      * 
-     * If semaphore_counter > 0 then it is safe to cross
+     * If s_val > 0 then it is safe to cross
      * otherwise, stop the thread using wait()
      * 
-     * When a thread finishes crossing, it will notify another thread using the notify_one()
-     * once one thread is notified, if it's predicate is true (semaphore_value > 0), 
-     * then the thread will no longer wait() so it can now cross
+     * When a thread finishes crossing, it will notify another thread using notify_one()
+     * and once one thread is notified and it's predicate (s_val > 0) is true, 
+     * then the thread will iterate the loop again, skipping wait() and decrementing s_val so it can now cross
      */
     while (true) {    //rm
-      mutex_lock.lock();
-      if (semaphore_value > 0) {
-        semaphore_value--;
-        mutex_lock.unlock();
+      m_lock.lock();
+      if (s_val > 0) {
+        s_val--;
+        m_lock.unlock();
         break;
       } else {
-      	mutex_lock.unlock();
-      	unique_lock<mutex> wait_lock(mutex_lock);
-		    cv_lock.wait(wait_lock, [] {return semaphore_value > 0;});
+      	m_lock.unlock();
+      	unique_lock<mutex> wait_lock(m_lock);
+		    cv_lock.wait(wait_lock, [] {return s_val > 0;});
       }
     }
 
@@ -606,9 +609,12 @@ void Lizard::madeIt2Sago()
 		cout << flush;
     }
 
-    mutex_lock.lock();    //rm
-    semaphore_value++;
-    mutex_lock.unlock();
+    /**
+     * Increment s_val then notify another thread
+     */
+    m_lock.lock();    //rm
+    s_val++;
+    m_lock.unlock();
     cv_lock.notify_one();
 
 }
@@ -717,7 +723,7 @@ int main(int argc, char **argv)
 	/*
      * Initialize locks and/or semaphores
      */
-    semaphore_value = MAX_LIZARD_CROSSING;    //rm
+    s_val = MAX_LIZARD_CROSSING;    //rm
 
 
 
