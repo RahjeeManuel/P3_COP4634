@@ -27,7 +27,6 @@
 #include <vector>
 #include <condition_variable>
 
-
 using namespace std;
 
 /*
@@ -95,9 +94,9 @@ using namespace std;
 /*
  * Declare global variables here
  */
-mutex mutex_m;     //rm
-int sem_val;
-condition_variable lock_cv;
+mutex mutex_lock;   //rm
+condition_variable cv_lock;
+int semaphore_value;
 
 /**************************************************/
 /* Please leave these variables alone.  They are  */
@@ -163,7 +162,7 @@ int Cat::getId()
  void Cat::run() 
  {
 	 // launch the thread to simulate the cat's behavior	 
-	 _catThread = new thread ( catThread, this);      //rm
+	 _catThread = new thread ( catThread, this);    //rm
  }
  
  /**
@@ -174,7 +173,7 @@ int Cat::getId()
  void Cat::wait()
  {
 	 // wait for the thread to terminate
-	if (_catThread != NULL) {     //rm
+	if (_catThread != NULL) {   //rm
         _catThread->join();
         delete _catThread;
     } 
@@ -315,7 +314,7 @@ int Lizard::getId()
 	 // wait for the thread to terminate
 	if (_aLizard != NULL) {
         _aLizard->join();
-        delete _aLizard;
+        delete _aLizard;    //rm
     } 
  }
  
@@ -369,16 +368,26 @@ void Lizard::sago2MonkeyGrassIsSafe()
 		cout << flush;
     }
 		
-    while (true) {     //rm			//this loop will run a max of two times
-      mutex_m.lock();
-      if (sem_val > 0) {
-        sem_val--;
-        mutex_m.unlock();
+    /**
+     * Using condition variables to prevent busy waiting
+     * 
+     * If semaphore_counter > 0 then it is safe to cross
+     * otherwise, stop the thread using wait()
+     * 
+     * When a thread finishes crossing, it will notify another thread using the notify_one()
+     * once one thread is notified, if it's predicate is true (semaphore_value > 0), 
+     * then the thread will no longer wait() so it can now cross
+     */
+    while (true) {    //rm
+      mutex_lock.lock();
+      if (semaphore_value > 0) {
+        semaphore_value--;
+        mutex_lock.unlock();
         break;
       } else {
-      	mutex_m.unlock();
-      	unique_lock<mutex> wait_lock(mutex_m);
-		lock_cv.wait(wait_lock, [] {return sem_val > 0;});			//loop stops here until notified and predicate is true
+      	mutex_lock.unlock();
+      	unique_lock<mutex> wait_lock(mutex_lock);
+		    cv_lock.wait(wait_lock, [] {return semaphore_value > 0;});
       }
     }
 
@@ -450,10 +459,10 @@ void Lizard::madeIt2MonkeyGrass()
 		cout << flush;
     }
 
-    mutex_m.lock();     //rm
-    sem_val++;
-    lock_cv.notify_one();
-    mutex_m.unlock();
+    mutex_lock.lock();    //rm
+    semaphore_value++;
+    mutex_lock.unlock();
+    cv_lock.notify_one();
 
 
 
@@ -505,16 +514,26 @@ void Lizard::monkeyGrass2SagoIsSafe()
 		cout << flush;
     }
 
-    while (true) {     //rm			//this loop will run a max of two times
-      mutex_m.lock();
-      if (sem_val > 0) {
-        sem_val--;
-        mutex_m.unlock();
+    /**
+     * Using condition variables to prevent busy waiting
+     * 
+     * If semaphore_counter > 0 then it is safe to cross
+     * otherwise, stop the thread using wait()
+     * 
+     * When a thread finishes crossing, it will notify another thread using the notify_one()
+     * once one thread is notified, if it's predicate is true (semaphore_value > 0), 
+     * then the thread will no longer wait() so it can now cross
+     */
+    while (true) {    //rm
+      mutex_lock.lock();
+      if (semaphore_value > 0) {
+        semaphore_value--;
+        mutex_lock.unlock();
         break;
       } else {
-      	mutex_m.unlock();
-      	unique_lock<mutex> wait_lock(mutex_m);
-		lock_cv.wait(wait_lock, [] {return sem_val > 0;});			//loop stops here until notified and predicate is true
+      	mutex_lock.unlock();
+      	unique_lock<mutex> wait_lock(mutex_lock);
+		    cv_lock.wait(wait_lock, [] {return semaphore_value > 0;});
       }
     }
 
@@ -587,10 +606,10 @@ void Lizard::madeIt2Sago()
 		cout << flush;
     }
 
-    mutex_m.lock();     //rm
-    sem_val++;
-    lock_cv.notify_one();
-    mutex_m.unlock();
+    mutex_lock.lock();    //rm
+    semaphore_value++;
+    mutex_lock.unlock();
+    cv_lock.notify_one();
 
 }
 
@@ -623,7 +642,7 @@ void Lizard::lizardThread(Lizard *aLizard)
        * are already completed - see the comments.
        */
 
-      aLizard->sleepNow();      //rm
+      aLizard->sleepNow();    //rm
       aLizard->sago2MonkeyGrassIsSafe();
       aLizard->crossSago2MonkeyGrass();
       aLizard->madeIt2MonkeyGrass();
@@ -698,7 +717,7 @@ int main(int argc, char **argv)
 	/*
      * Initialize locks and/or semaphores
      */
-    sem_val = MAX_LIZARD_CROSSING;
+    semaphore_value = MAX_LIZARD_CROSSING;    //rm
 
 
 
@@ -714,7 +733,7 @@ int main(int argc, char **argv)
     /*
      * Create NUM_CATS cat threads
      */
-    vector<Cat*> allCats;     //rm
+    vector<Cat*> allCats;   //rm
     for (int i=0; i < NUM_CATS; i++) {
 	    allCats.push_back(new Cat(i));
     }      
@@ -726,7 +745,7 @@ int main(int argc, char **argv)
     for (int i=0; i < NUM_LIZARDS; i++) {
         allLizards[i]->run();
     }
-    for (int i=0; i < NUM_CATS; i++) {      //rm
+    for (int i=0; i < NUM_CATS; i++) {    //rm
         allCats[i]->run();
     }    
 
@@ -745,7 +764,7 @@ int main(int argc, char **argv)
     /*
      * Wait until all threads terminate
      */
-    for (int i=0; i < NUM_LIZARDS; i++) {     //rm
+    for (int i=0; i < NUM_LIZARDS; i++) {   //rm
         allLizards[i]->wait();
     }
     for (int i=0; i < NUM_CATS; i++) {
@@ -766,7 +785,7 @@ int main(int argc, char **argv)
 	/*
 	 * Delete all cat and lizard objects
 	 */
-    for (int i=0; i < NUM_LIZARDS; i++) {     //rm
+    for (int i=0; i < NUM_LIZARDS; i++) {   //rm
 	    delete allLizards.at(i);
     }
     for (int i=0; i < NUM_CATS; i++) {
