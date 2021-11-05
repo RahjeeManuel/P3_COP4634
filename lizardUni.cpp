@@ -1,3 +1,4 @@
+//extra-credit
 /***************************************************************/
 /*                                                             */
 /* lizard.cpp                                                  */
@@ -97,6 +98,8 @@ using namespace std;
 mutex m_lock;   //rm
 condition_variable cv_lock;
 int s_val;
+int SAGO2GRASSSEMAPHORE;
+int GRASS2SAGOSEMPHORE;
 
 /**************************************************/
 /* Please leave these variables alone.  They are  */
@@ -378,17 +381,17 @@ void Lizard::sago2MonkeyGrassIsSafe()
      * and once one thread is notified and it's predicate (s_val > 0) is true, 
      * then the thread will iterate the loop again, skipping wait() and decrementing s_val so it can now cross
      */
-    while (true) {    //rm
+    while (true) {    //OR
       m_lock.lock();
-      if (s_val > 0) {
-        s_val--;
-        m_lock.unlock();
-        break;
-      } else {
+       if (UNIDIRECTIONAL && SAGO2GRASSSEMAMPHORE > 0 && GRASS2SAGOSEMAPHORE == 4) {
+         SAGO2GRASSSEMAPHORE--;
+         m_lock.unlock();
+         break;
+       } else {
       	m_lock.unlock();
       	unique_lock<mutex> wait_lock(m_lock);
 		    cv_lock.wait(wait_lock, [] {return s_val > 0;});
-      }
+       }
     }
 
 	if (debug)
@@ -527,13 +530,14 @@ void Lizard::monkeyGrass2SagoIsSafe()
      * and once one thread is notified and it's predicate (s_val > 0) is true, 
      * then the thread will iterate the loop again, skipping wait() and decrementing s_val so it can now cross
      */
-    while (true) {    //rm
+    while (true) {    //OR
       m_lock.lock();
-      if (s_val > 0) {
-        s_val--;
-        m_lock.unlock();
-        break;
-      } else {
+       if (UNIDIRECTIONAL && GRASS2SAGOSEMAMPHORE > 0 && SAGO2GRASSSEMAPHORE == 4) {
+         GRASS2SAGOSEMAPHORE--; 
+         s_val--;
+         m_lock.unlock();
+         break;
+       } else {
       	m_lock.unlock();
       	unique_lock<mutex> wait_lock(m_lock);
 		    cv_lock.wait(wait_lock, [] {return s_val > 0;});
@@ -657,7 +661,6 @@ void Lizard::lizardThread(Lizard *aLizard)
       aLizard->crossMonkeyGrass2Sago();
       aLizard->madeIt2Sago();
 
-
     }
 }
  
@@ -693,10 +696,12 @@ int main(int argc, char **argv)
 	/*
      * Initialize variables
      */
+	//O.R
 	numCrossingSago2MonkeyGrass = 0;
 	numCrossingMonkeyGrass2Sago = 0;
 	running = 1;
-
+	SAGO2GRASSSEMAPHORE = 4;
+	GRASS2SAGOSEMPHORE = 4;     
 
 	/*
      * Initialize random number generator
@@ -707,7 +712,7 @@ int main(int argc, char **argv)
 	/*
      * Initialize locks and/or semaphores
      */
-    s_val = MAX_LIZARD_CROSSING;    //rm
+    s_val = MAX_LIZARD_CROSSING; 
 
 
 
@@ -754,7 +759,7 @@ int main(int argc, char **argv)
     /*
      * Wait until all threads terminate
      */
-    for (int i=0; i < NUM_LIZARDS; i++) {   //rm
+    for (int i=0; i < NUM_LIZARDS; i++) { 
         allLizards[i]->wait();
     }
     for (int i=0; i < NUM_CATS; i++) {
@@ -775,7 +780,7 @@ int main(int argc, char **argv)
 	/*
 	 * Delete all cat and lizard objects
 	 */
-    for (int i=0; i < NUM_LIZARDS; i++) {   //rm
+    for (int i=0; i < NUM_LIZARDS; i++) {
 	    delete allLizards.at(i);
     }
     for (int i=0; i < NUM_CATS; i++) {
@@ -790,9 +795,4 @@ int main(int argc, char **argv)
      */
 	return 0;
 }
-
-
-
-
-
 
