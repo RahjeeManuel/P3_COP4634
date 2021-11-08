@@ -199,7 +199,7 @@ void Cat::sleepNow()
 
 	if (debug)
     {
-		cout << "[" + to_string(_id) + "] cat sleeping for " + sleepSeconds + " seconds\n"; //O.R
+		cout << "[" + to_string(_id) + "] cat sleeping for " + to_string(sleepSeconds) + " seconds\n"; //O.R
 		cout << flush;
     }
 
@@ -207,7 +207,7 @@ void Cat::sleepNow()
 
 	if (debug)
     {
-		cout << "[" + to_string(_id) + "] cat awake\n";
+		cout << "[" + to_string(_id) + "] cat awake\n";//O.R
 		cout << flush;
     }
 }
@@ -228,7 +228,7 @@ void Cat::catThread (Cat *aCat)
 
 	if (debug)
     {
-		cout << "[" << aCat->getId() << "] cat is alive\n";
+		cout << "[" + to_string(aCat->getId()) + "] cat is alive\n";
 		cout << flush;
     }
 
@@ -339,7 +339,7 @@ void Lizard::sleepNow()
 
 	if (debug)
     {
-      cout << "[" << _id << "] sleeping for " << sleepSeconds << " seconds" << endl;
+      cout << "[" + to_string(_id) + "] sleeping for " + to_string(sleepSeconds) + " seconds\n";//O.R
       cout << flush;
     }
 
@@ -347,7 +347,7 @@ void Lizard::sleepNow()
 
 	if (debug)
     {
-      cout << "[" << _id << "] awake" << endl;
+      cout << "[" + to_string(_id) + "] awake\n";//O.R
       cout << flush;
     }
 }
@@ -367,7 +367,7 @@ void Lizard::sago2MonkeyGrassIsSafe()
 {
 	if (debug)
     {
-		cout << "[" << _id << "] checking  sago -> monkey grass" << endl;
+		cout << "[" + to_string(_id) + "] checking  sago -> monkey grass\n"; //O.R
 		cout << flush;
     }
 
@@ -396,7 +396,7 @@ void Lizard::sago2MonkeyGrassIsSafe()
 
 	if (debug)
     {
-		cout << "[" << _id << "] thinks  sago -> monkey grass  is safe" << endl;
+		cout << "[" + to_string(_id) + "] thinks  sago -> monkey grass  is safe\n";//O.R
 		cout << flush;
     }
 }
@@ -412,8 +412,8 @@ void Lizard::sago2MonkeyGrassIsSafe()
 void Lizard::crossSago2MonkeyGrass()
 {
 	if (debug)
-    {
-      cout << "[" << _id << "] crossing  sago -> monkey grass" << endl;
+    {//O.R
+      cout << "[" + to_string(_id) + "] crossing  sago -> monkey grass\n";
       cout << flush;
     }
 
@@ -426,10 +426,10 @@ void Lizard::crossSago2MonkeyGrass()
      * Check for lizards cross both ways
      */
 	if (numCrossingMonkeyGrass2Sago && UNIDIRECTIONAL)
-    {
-		cout << "\tCrash!  We have a pile-up on the concrete." << endl;
-		cout << "\t" << numCrossingSago2MonkeyGrass << " crossing sago -> monkey grass" << endl;
-		cout << "\t" << numCrossingMonkeyGrass2Sago << " crossing monkey grass -> sago" << endl;
+    {//O.R
+		cout << "\tCrash!  We have a pile-up on the concrete.\n";
+		cout << "\t" + to_string(numCrossingSago2MonkeyGrass) + " crossing sago -> monkey grass\n";
+		cout << "\t" + to_string(numCrossingMonkeyGrass2Sago) + " crossing monkey grass -> sago\n";
 		exit( -1 );
     }
 
@@ -457,8 +457,8 @@ void Lizard::madeIt2MonkeyGrass()
      * Whew, made it across
      */
 	if (debug)
-    {
-		cout << "[" << _id << "] made the  sago -> monkey grass  crossing" << endl;
+    {//O.R
+		cout << "[" + to_string(_id) + "] made the  sago -> monkey grass  crossing\n";
 		cout << flush;
     }
 
@@ -487,8 +487,8 @@ void Lizard::eat()
 	eatSeconds = 1 + (int)(random() / (double)RAND_MAX * MAX_LIZARD_EAT);
 
 	if (debug)
-    {
-		cout << "[" << _id << "] eating for " << eatSeconds << " seconds" << endl;
+    {//O.R.
+		cout << "[" + to_string(_id) + "] eating for " + to_string(eatSeconds) + " seconds\n";
 		cout << flush;
     }
 
@@ -498,8 +498,8 @@ void Lizard::eat()
 	sleep( eatSeconds );
 
 	if (debug)
-    {
-      cout << "[" << _id << "] finished eating" << endl;
+    {//O.R
+      cout << "[" + to_string(_id) + "] finished eating\n";
       cout << flush;
     }
 }
@@ -515,8 +515,8 @@ void Lizard::eat()
 void Lizard::monkeyGrass2SagoIsSafe()
 {
 	if (debug)
-    {
-		cout << "[" << _id << "] checking  monkey grass -> sago" << endl;
+    {//O.R
+		cout << "[" + to_string(_id) + "] checking  monkey grass -> sago\n";
 		cout << flush;
     }
 
@@ -544,8 +544,8 @@ void Lizard::monkeyGrass2SagoIsSafe()
     }
 
 	if (debug)
-    {
-		cout << "[" << _id << "] thinks  monkey grass -> sago  is safe" << endl;
+    {//O.R
+		cout << "[" + to_string(_id) + "] thinks  monkey grass -> sago  is safe\n";
 		cout << flush;
     }
 }
@@ -561,8 +561,8 @@ void Lizard::monkeyGrass2SagoIsSafe()
 void Lizard::crossMonkeyGrass2Sago()
 {
 	if (debug)
-    {
-		cout << "[" << _id << "] crossing  monkey grass -> sago" << endl;
+    {//O.R
+		cout << "[" + to_string(_id) + "] crossing  monkey grass -> sago\n";
 		cout << flush;
     }
 
@@ -576,10 +576,10 @@ void Lizard::crossMonkeyGrass2Sago()
      * Check for lizards cross both ways
      */
 	if (numCrossingSago2MonkeyGrass && UNIDIRECTIONAL)
-    {
-		cout << "\tOh No!, the lizards have cats all over them." << endl;
-		cout << "\t " << numCrossingSago2MonkeyGrass << " crossing sago -> monkey grass" << endl;
-		cout << "\t " << numCrossingMonkeyGrass2Sago << " crossing monkey grass -> sago" << endl;
+    {//O.R
+		cout << "\tOh No!, the lizards have cats all over them.\n";
+		cout << "\t " + to_string(numCrossingSago2MonkeyGrass) + " crossing sago -> monkey grass\n";
+		cout << "\t " + to_string(numCrossingMonkeyGrass2Sago) + " crossing monkey grass -> sago\n";
 		exit( -1 );
     }
 
@@ -607,8 +607,8 @@ void Lizard::madeIt2Sago()
      * Whew, made it across
      */
 	if (debug)
-    {
-		cout << "[" << _id << "] made the  monkey grass -> sago  crossing" << endl;
+    {//O.R
+		cout << "[" + to_string(_id) + "] made the  monkey grass -> sago  crossing\n";
 		cout << flush;
     }
 
@@ -636,8 +636,8 @@ void Lizard::madeIt2Sago()
 void Lizard::lizardThread(Lizard *aLizard)
 {	
 	if (debug)
-    {
-      cout << "[" << aLizard->getId() << "] lizard is alive" << endl;
+    {//O.R
+      cout << "[" + to_string(aLizard->getId()) + "] lizard is alive\n";
       cout << flush;
     }
 
