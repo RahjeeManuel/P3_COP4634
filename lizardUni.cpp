@@ -47,7 +47,7 @@ using namespace std;
  * Make this 1 to check for lizards travelling in both directions
  * Leave it 0 to allow bidirectional travel
  */
-#define UNIDIRECTIONAL       0
+#define UNIDIRECTIONAL       1
 
 /*
  * Set this to the number of seconds you want the lizard world to
@@ -199,7 +199,7 @@ void Cat::sleepNow()
 
 	if (debug)
     {
-		cout << "[" << _id << "] cat sleeping for " << sleepSeconds << " seconds" << endl;
+		cout << "[" + to_string(_id) + "] cat sleeping for " + sleepSeconds + " seconds\n"; //O.R
 		cout << flush;
     }
 
@@ -207,7 +207,7 @@ void Cat::sleepNow()
 
 	if (debug)
     {
-		cout << "[" << _id << "] cat awake" << endl;
+		cout << "[" + to_string(_id) + "] cat awake\n";
 		cout << flush;
     }
 }
@@ -390,7 +390,7 @@ void Lizard::sago2MonkeyGrassIsSafe()
        } else {
       	m_lock.unlock();
       	unique_lock<mutex> wait_lock(m_lock);
-		    cv_lock.wait(wait_lock, [] {return s_val > 0;});
+		    cv_lock.wait(wait_lock, [] { return ((UNIDIRECTIONAL && SAGO2GRASSSEMAPHORE > 0 && GRASS2SAGOSEMAPHORE == MAX_LIZARD_CROSSING )||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING)));});
        }
     }
 
@@ -466,7 +466,7 @@ void Lizard::madeIt2MonkeyGrass()
      * Increment s_val then notify another thread
      */
     m_lock.lock();    //rm
-    s_val++;
+    SAGO2GRASSSEMAPHORE++;
     m_lock.unlock();//OR
     cv_lock.notify_all();// cv_lock.notify_one()
 
@@ -539,7 +539,7 @@ void Lizard::monkeyGrass2SagoIsSafe()
        } else {
       	m_lock.unlock();
       	unique_lock<mutex> wait_lock(m_lock);
-		    cv_lock.wait(wait_lock, [] {return s_val > 0;});
+		    cv_lock.wait(wait_lock, [] {return ((UNIDIRECTIONAL && GRASS2SAGOSEMAPHORE > 0 && SAGO2GRASSSEMAPHORE == MAX_LIZARD_CROSSING) ||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING)));});
       }
     }
 
@@ -616,7 +616,7 @@ void Lizard::madeIt2Sago()
      * Increment s_val then notify another thread
      */
     m_lock.lock();    //rm
-    s_val++;
+    GRASS2SAGOSEMAPHORE++;
     m_lock.unlock();
     cv_lock.notify_all();//OR
 
