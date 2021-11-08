@@ -383,7 +383,7 @@ void Lizard::sago2MonkeyGrassIsSafe()
      */
     while (true) {    //O.R.
       m_lock.lock();
-       if (UNIDIRECTIONAL && SAGO2GRASSSEMAMPHORE > 0 && GRASS2SAGOSEMAPHORE == 4) {
+       if ((UNIDIRECTIONAL && SAGO2GRASSSEMAMPHORE > 0 && GRASS2SAGOSEMAPHORE == MAX_LIZARD_CROSSING )||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING))) {
          SAGO2GRASSSEMAPHORE--;
          m_lock.unlock();
          break;
@@ -532,7 +532,7 @@ void Lizard::monkeyGrass2SagoIsSafe()
      */
     while (true) { //O.R.
       m_lock.lock();
-       if (UNIDIRECTIONAL && GRASS2SAGOSEMAPHORE > 0 && SAGO2GRASSSEMAPHORE == 4) {
+       if ((UNIDIRECTIONAL && GRASS2SAGOSEMAPHORE > 0 && SAGO2GRASSSEMAPHORE == MAX_LIZARD_CROSSING) || ||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING))) {
          GRASS2SAGOSEMAPHORE--; 
          m_lock.unlock();
          break;
