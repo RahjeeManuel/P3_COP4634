@@ -7,11 +7,11 @@
 /*   lizard.cpp                                                */
 /*                                                             */
 /* Be sure to use the -lpthread option for the compile command */
-/*   g++ -g -Wall -std=c++11 lizard.cpp -o lizard -pthread     */
+/*   g++ -g -Wall -std=c++11 lizardUni.cpp -o lizardUni -pthread     */
 /*                                                             */
 /* Execute with the -d command-line option to enable debugging */
 /* output.  For example,                                       */
-/*   ./lizard -d                                               */
+/*   ./lizardUni -d                                               */
 /*                                                             */
 /***************************************************************/
 
@@ -99,7 +99,7 @@ mutex m_lock;   //rm
 condition_variable cv_lock;
 int s_val;
 int SAGO2GRASSSEMAPHORE;
-int GRASS2SAGOSEMPHORE;
+int GRASS2SAGOSEMAPHORE;
 
 /**************************************************/
 /* Please leave these variables alone.  They are  */
@@ -383,7 +383,7 @@ void Lizard::sago2MonkeyGrassIsSafe()
      */
     while (true) {    //O.R.
       m_lock.lock();
-       if ((UNIDIRECTIONAL && SAGO2GRASSSEMAMPHORE > 0 && GRASS2SAGOSEMAPHORE == MAX_LIZARD_CROSSING )||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING))) {
+       if ((UNIDIRECTIONAL && SAGO2GRASSSEMAPHORE > 0 && GRASS2SAGOSEMAPHORE == MAX_LIZARD_CROSSING )||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING))) {
          SAGO2GRASSSEMAPHORE--;
          m_lock.unlock();
          break;
@@ -467,7 +467,7 @@ void Lizard::madeIt2MonkeyGrass()
      */
     m_lock.lock();    //rm
     s_val++;
-    m_lock.unlock();
+    m_lock.unlock();//OR
     cv_lock.notify_all();// cv_lock.notify_one()
 
 
@@ -532,7 +532,7 @@ void Lizard::monkeyGrass2SagoIsSafe()
      */
     while (true) { //O.R.
       m_lock.lock();
-       if ((UNIDIRECTIONAL && GRASS2SAGOSEMAPHORE > 0 && SAGO2GRASSSEMAPHORE == MAX_LIZARD_CROSSING) || ||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING))) {
+       if ((UNIDIRECTIONAL && GRASS2SAGOSEMAPHORE > 0 && SAGO2GRASSSEMAPHORE == MAX_LIZARD_CROSSING) ||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING))) {
          GRASS2SAGOSEMAPHORE--; 
          m_lock.unlock();
          break;
@@ -618,7 +618,7 @@ void Lizard::madeIt2Sago()
     m_lock.lock();    //rm
     s_val++;
     m_lock.unlock();
-    cv_lock.notify_all();
+    cv_lock.notify_all();//OR
 
 }
 
@@ -699,9 +699,6 @@ int main(int argc, char **argv)
 	numCrossingSago2MonkeyGrass = 0;
 	numCrossingMonkeyGrass2Sago = 0;
 	running = 1;
-	SAGO2GRASSSEMAPHORE = 4;
-	GRASS2SAGOSEMPHORE = 4;     
-
 	/*
      * Initialize random number generator
 	 */
@@ -711,8 +708,8 @@ int main(int argc, char **argv)
 	/*
      * Initialize locks and/or semaphores
      */
-    s_val = MAX_LIZARD_CROSSING; 
-
+	SAGO2GRASSSEMAPHORE = 4; //O.R
+	GRASS2SAGOSEMAPHORE = 4;
 
 
 	/*
