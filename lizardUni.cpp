@@ -1,10 +1,10 @@
 //extra-credit
 /***************************************************************/
 /*                                                             */
-/* lizard.cpp                                                  */
+/* lizardUni.cpp                                                  */
 /*                                                             */
 /* To compile, you need all the files listed below             */
-/*   lizard.cpp                                                */
+/*   lizardUni.cpp                                                */
 /*                                                             */
 /* Be sure to use the -lpthread option for the compile command */
 /*   g++ -g -Wall -std=c++11 lizardUni.cpp -o lizardUni -pthread     */
@@ -97,7 +97,6 @@ using namespace std;
  */
 mutex m_lock;   //rm
 condition_variable cv_lock;
-int s_val;
 int SAGO2GRASSSEMAPHORE;
 int GRASS2SAGOSEMAPHORE;
 
@@ -371,26 +370,20 @@ void Lizard::sago2MonkeyGrassIsSafe()
 		cout << flush;
     }
 
-    /**
-     * Using condition variables to prevent busy waiting
-     * 
-     * If s_val > 0 then it is safe to cross
-     * otherwise, stop the thread using wait()
-     * 
-     * When a thread finishes crossing, it will notify another thread using notify_one()
-     * and once one thread is notified and it's predicate (s_val > 0) is true, 
-     * then the thread will iterate the loop again, skipping wait() and decrementing s_val so it can now cross
-     */
     while (true) {    //O.R.
       m_lock.lock();
-       if ((UNIDIRECTIONAL && SAGO2GRASSSEMAPHORE > 0 && GRASS2SAGOSEMAPHORE == MAX_LIZARD_CROSSING )||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING))) {
+       if ((UNIDIRECTIONAL && SAGO2GRASSSEMAPHORE > 0 && GRASS2SAGOSEMAPHORE == MAX_LIZARD_CROSSING )
+          || (!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE + GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING))) {
          SAGO2GRASSSEMAPHORE--;
          m_lock.unlock();
          break;
        } else {
       	m_lock.unlock();
       	unique_lock<mutex> wait_lock(m_lock);
-		    cv_lock.wait(wait_lock, [] { return ((UNIDIRECTIONAL && SAGO2GRASSSEMAPHORE > 0 && GRASS2SAGOSEMAPHORE == MAX_LIZARD_CROSSING )||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING)));});
+		    cv_lock.wait(wait_lock, [] {
+          return (UNIDIRECTIONAL && SAGO2GRASSSEMAPHORE > 0 && GRASS2SAGOSEMAPHORE == MAX_LIZARD_CROSSING )
+            || (!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE + GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING));
+        });
        }
     }
 
@@ -463,12 +456,12 @@ void Lizard::madeIt2MonkeyGrass()
     }
 
     /**
-     * Increment s_val then notify another thread
+     * Increment then notify another thread
      */
     m_lock.lock();    //rm
     SAGO2GRASSSEMAPHORE++;
     m_lock.unlock();//OR
-    cv_lock.notify_all();// cv_lock.notify_one()
+    cv_lock.notify_all();
 
 
 
@@ -520,26 +513,20 @@ void Lizard::monkeyGrass2SagoIsSafe()
 		cout << flush;
     }
 
-    /**
-     * Using condition variables to prevent busy waiting
-     * 
-     * If s_val > 0 then it is safe to cross
-     * otherwise, stop the thread using wait()
-     * 
-     * When a thread finishes crossing, it will notify another thread using notify_one()
-     * and once one thread is notified and it's predicate (s_val > 0) is true, 
-     * then the thread will iterate the loop again, skipping wait() and decrementing s_val so it can now cross
-     */
     while (true) { //O.R.
       m_lock.lock();
-       if ((UNIDIRECTIONAL && GRASS2SAGOSEMAPHORE > 0 && SAGO2GRASSSEMAPHORE == MAX_LIZARD_CROSSING) ||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING))) {
+       if ((UNIDIRECTIONAL && GRASS2SAGOSEMAPHORE > 0 && SAGO2GRASSSEMAPHORE == MAX_LIZARD_CROSSING)
+          || (!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE + GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING))) {
          GRASS2SAGOSEMAPHORE--; 
          m_lock.unlock();
          break;
        } else {
       	m_lock.unlock();
       	unique_lock<mutex> wait_lock(m_lock);
-		    cv_lock.wait(wait_lock, [] {return ((UNIDIRECTIONAL && GRASS2SAGOSEMAPHORE > 0 && SAGO2GRASSSEMAPHORE == MAX_LIZARD_CROSSING) ||(!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE+GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING)));});
+		    cv_lock.wait(wait_lock, [] {
+          return (UNIDIRECTIONAL && GRASS2SAGOSEMAPHORE > 0 && SAGO2GRASSSEMAPHORE == MAX_LIZARD_CROSSING)
+            || (!UNIDIRECTIONAL && ((SAGO2GRASSSEMAPHORE + GRASS2SAGOSEMAPHORE) > MAX_LIZARD_CROSSING));
+        });
       }
     }
 
@@ -613,7 +600,7 @@ void Lizard::madeIt2Sago()
     }
 
     /**
-     * Increment s_val then notify another thread
+     * Increment then notify another thread
      */
     m_lock.lock();    //rm
     GRASS2SAGOSEMAPHORE++;

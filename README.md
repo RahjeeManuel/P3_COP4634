@@ -20,11 +20,14 @@ will not differ in their behavior, but they will vary in who is awake to check o
 2. lizardUni.cpp
 3. MakeFile
 4. analysis.pdf
+5. README.txt
 
 # Submission
-1. To compile the lizard.cpp use the Make command
+1. To compile the lizard.cpp use make
 2. To run the lizard.cpp use ./lizard -d
-3. To compile the lizardUni use the g++ -g -Wall -std=c++11 lizardUni.cpp -o lizardUni -pthread 
-4. To use unidirectional mode change the UNIDIRECTIONAL varible in the lizardUni.cpp file to 1
-5. To use bidirectional mode change the UNIDIRECTIONAL varible in the lizardUni.cpp file to 0
-6. To run the lizardUni.cpp use ./lizard -d
+3. To clean the directory use make clean
+4. To compile the lizardUni use g++ -g -Wall -std=c++11 lizardUni.cpp -o lizardUni -pthread 
+5. To use unidirectional mode change the UNIDIRECTIONAL varible in the lizardUni.cpp file to 1
+6. To use bidirectional mode change the UNIDIRECTIONAL varible in the lizardUni.cpp file to 0
+7. To run the lizardUni.cpp use ./lizardUni -d
+8. To remove lizardUni use rm -f lizardUni
