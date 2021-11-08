@@ -27,7 +27,7 @@ will not differ in their behavior, but they will vary in who is awake to check o
 2. To run the lizard.cpp use ./lizard -d
 3. To clean the directory use make clean
 4. To compile the lizardUni use g++ -g -Wall -std=c++11 lizardUni.cpp -o lizardUni -pthread 
-5. To use unidirectional mode change the UNIDIRECTIONAL varible in the lizardUni.cpp file to 1
-6. To use bidirectional mode change the UNIDIRECTIONAL varible in the lizardUni.cpp file to 0
+5. To use unidirectional mode change the UNIDIRECTIONAL variable in the lizardUni.cpp file to 1
+6. To use bidirectional mode change the UNIDIRECTIONAL variable in the lizardUni.cpp file to 0
 7. To run the lizardUni.cpp use ./lizardUni -d
 8. To remove lizardUni use rm -f lizardUni
